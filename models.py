@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-DEFAULT_IMAGE = 'https://picsum.photos/id/237/200/300'
+DEFAULT_IMAGE = 'https://tinyurl.com/demo-cupcake'
 
 class Cupcake(db.Model):
   """Cupcake"""
