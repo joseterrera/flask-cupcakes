@@ -16,7 +16,7 @@ class Cupcake(db.Model):
   rating = db.Column(db.Float, nullable=False)
   image = db.Column(db.Text, nullable=False, default=DEFAULT_IMAGE)
 
-  dev to_dict(self):
+  def to_dict(self):
     """Serialize cupcake to a dict of cupcake info"""
 
     return {
