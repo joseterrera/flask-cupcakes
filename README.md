@@ -8,7 +8,9 @@ $ source venv/bin/activate
 ```
 
 ### Install pachackes in requirements.txt
+```console
 pip3 install -r requirements.txt
+```
 
 
 ### Create a database
