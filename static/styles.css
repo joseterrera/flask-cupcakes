@@ -1,0 +1,9 @@
+#cupcake-list {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.cupcake-item {
+  width: 30%;
+  
+}

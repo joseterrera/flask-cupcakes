@@ -7,7 +7,7 @@ const newCupcakeFormEl = document.querySelector('#new-cupcake-form');
  * */
 function generateCupcakeHTML(cupcake) {
   return `
-    <div data-cupcake-id=${cupcake.id}>
+    <div class="cupcake-item" data-cupcake-id=${cupcake.id}>
       <li>
         ${cupcake.flavor} / ${cupcake.size} / ${cupcake.rating}
         <button data-cupcake-id="${cupcake.id}" class="delete-button">X</button>
@@ -19,12 +19,12 @@ function generateCupcakeHTML(cupcake) {
   `;
 }
 
+let cupcakeListHtml = []
 async function showInitialCupcakes() {
   const response = await axios.get(`${BASE_URL}/cupcakes`);
   // initially, was going to use empty string here and concat, but concat would not have
   // been efficient in a loop as it rewrites the string every single time it loops.
   // Push is more efficient.
-  let cupcakeListHtml = []
   for (let cupcakeData of response.data.cupcakes) {
     cupcakeListHtml.push(generateCupcakeHTML(cupcakeData))
   }
@@ -32,7 +32,7 @@ async function showInitialCupcakes() {
 }
 
 
-$("#new-cupcake-form").on('submit', async function(evt) {
+newCupcakeFormEl.addEventListener('submit', async function(evt) {
   evt.preventDefault();
   let flavor  = document.querySelector('#form-flavor').value;
   let rating = document.querySelector('#form-rating').value;
@@ -46,11 +46,11 @@ $("#new-cupcake-form").on('submit', async function(evt) {
     image
   });
   // console.log('newcupcakeresponse', newCupcakeResponse.data.cupcake)
-  let newCupcake = $(generateCupcakeHTML(newCupcakeResponse.data.cupcake));
-  cupcakeListEl.append(newCupcake);
+  let newCupcake = generateCupcakeHTML(newCupcakeResponse.data.cupcake);
+  cupcakeListHtml.push(newCupcake)
+  cupcakeListEl.innerHTML = cupcakeListHtml.join('\n\n')
   newCupcakeFormEl.reset();
-});
-
+})
 
 /**
  * Delete cupcake
@@ -58,7 +58,7 @@ $("#new-cupcake-form").on('submit', async function(evt) {
 function setDeleteHandlers() {
   
   const buttons = Array.from(document.querySelectorAll('.delete-button'))
-  console.log(buttons);
+  // console.log(buttons);
   for( let button of buttons ) {
     button.addEventListener('click', async function(event) {
       let cupcakeId = event.target.dataset.cupcakeId;
