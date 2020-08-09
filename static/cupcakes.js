@@ -1,46 +1,34 @@
 const BASE_URL = "http://localhost:5000/api";
 const cupcakeListEl = document.querySelector('#cupcakes-list')
 const newCupcakeFormEl = document.querySelector('#new-cupcake-form');
-/** given data about a cupcake, generate html */
 
-
+/** 
+ * given data about a cupcake, generate html 
+ * */
 function generateCupcakeHTML(cupcake) {
-  const cupcakeItemEl = document.createElement('div')
-  cupcakeItemEl.classList.add('cupcake-item');
-  cupcakeItemEl.setAttribute('data-cupcake-id', `${cupcake.id}` )
-  const cupcakeInfoEl = document.createElement('span');
-  cupcakeInfoEl.innerText = (` ${cupcake.flavor} / ${cupcake.size} / ${cupcake.rating}`);
-  const deleteButtonEl = document.createElement('button');
-  deleteButtonEl.classList.add('delete-button');
-  deleteButtonEl.setAttribute('data-cupcake-id', `${cupcake.id}`);
-  deleteButtonEl.innerText = 'X';
-  const imageEl = document.createElement('img');
-  imageEl.classList.add('cupcake-img');
-  imageEl.src = `${cupcake.image}`;
-
-  cupcakeItemEl.append(cupcakeInfoEl, deleteButtonEl, imageEl);
-
- return cupcakeListEl.append(cupcakeItemEl); 
+  return `
+    <div data-cupcake-id=${cupcake.id}>
+      <li>
+        ${cupcake.flavor} / ${cupcake.size} / ${cupcake.rating}
+        <button data-cupcake-id="${cupcake.id}" class="delete-button">X</button>
+      </li>
+      <img class="Cupcake-img"
+            src="${cupcake.image}"
+            alt="(no image provided)">
+    </div>
+  `;
 }
-
-// function generateCupcakeHTML(cupcake) {
-//   return `
-//     <div class="cupcake-item" data-cupcake-id=${cupcake.id}>
-//       <li>
-//       ${cupcake.flavor} / ${cupcake.size} / ${cupcake.rating}
-//       <button class="delete-button" data-cupcake-id=${cupcake.id}>X</button>
-//       </li>
-//       <img class="cupcake-img" src="${cupcake.image}">
-//     </div>
-//   `;
-// }
 
 async function showInitialCupcakes() {
   const response = await axios.get(`${BASE_URL}/cupcakes`);
+  // initially, was going to use empty string here and concat, but concat would not have
+  // been efficient in a loop as it rewrites the string every single time it loops.
+  // Push is more efficient.
+  let cupcakeListHtml = []
   for (let cupcakeData of response.data.cupcakes) {
-    let newCupcake = generateCupcakeHTML(cupcakeData);
-    cupcakeListEl.append(newCupcake);
+    cupcakeListHtml.push(generateCupcakeHTML(cupcakeData))
   }
+  cupcakeListEl.innerHTML = cupcakeListHtml.join('\n\n')
 }
 
 
@@ -67,32 +55,36 @@ $("#new-cupcake-form").on('submit', async function(evt) {
 /**
  * Delete cupcake
  */
-
 function setDeleteHandlers() {
-
-  cupcakeListEl.addEventListener('click', async function(event) {
-    let cupcakeId = event.target.dataset.cupcakeId;
-    let cupcake = event.target.closest('div');
-    await axios.delete(`${BASE_URL}/cupcakes/${cupcakeId}`);
-    cupcake.remove();
-  })
   
+  const buttons = Array.from(document.querySelectorAll('.delete-button'))
+  console.log(buttons);
+  for( let button of buttons ) {
+    button.addEventListener('click', async function(event) {
+      let cupcakeId = event.target.dataset.cupcakeId;
+      let cupcake = event.target.closest('div');
+      await axios.delete(`${BASE_URL}/cupcakes/${cupcakeId}`);
+      cupcake.remove();
+    })
+  }
 }
 
-
+// alternatue delete, leaving it here for reference, instead of targeting the buttons, I target the whole list and listen for clock events. Both ways are good.
 // function setDeleteHandlers() {
-//   console.log('he')
-//   const buttons = Array.from(document.querySelectorAll('.delete-button'))
-//   console.log(buttons);
-//   for( let button of buttons ) {
-//     button.addEventListener('click', function(event) {
-//       console.log('re')
-//       console.log(event.target.dataset.id)
-//     })
-//   }
+
+//   cupcakeListEl.addEventListener('click', async function(event) {
+//     let cupcakeId = event.target.dataset.cupcakeId;
+//     let cupcake = event.target.closest('div');
+//     await axios.delete(`${BASE_URL}/cupcakes/${cupcakeId}`);
+//     cupcake.remove();
+//   })
+  
 // }
 
 
 
-showInitialCupcakes()
-setDeleteHandlers()
+window.addEventListener('DOMContentLoaded', async () => {
+  await showInitialCupcakes()
+  setDeleteHandlers()  
+})
+
