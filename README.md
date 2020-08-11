@@ -30,3 +30,10 @@ python seed.py
 ```console
 flask run 
 ```
+
+
+### To run tests:
+
+```console
+python3 -m unittest -v tests
+```
